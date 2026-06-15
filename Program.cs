@@ -4,11 +4,14 @@
     {
         static void Main(string[] args)
         {
-            
+
+            Random rand = new Random();
 
             List<User> users = new List<User>();
            
             bool addUsers = true;
+
+            
 
             while(addUsers)
             {
@@ -18,9 +21,10 @@
                 Console.Write("Enter the accountBalance: \n");
                 double accountBalance = Convert.ToDouble(Console.ReadLine());
 
+                int userID = rand.Next(10, 100);
 
-                User user = new User(name, accountBalance);
-                
+                User user = new User(name, accountBalance, userID);
+                Console.WriteLine($"{user.name} {user.accountBalance} {user.userID}");
                 users.Add(user);
                 Console.WriteLine("Do you want to continue adding new users?");
                 string temp = Console.ReadLine().ToLower();
@@ -62,9 +66,16 @@
                     {
                         Console.WriteLine("Enter amount to withdraw:");
                         double withdrawAmount = Convert.ToDouble(Console.ReadLine());
-                        user.Withdraw(withdrawAmount);
-                        Console.WriteLine($"New account balance is {user.accountBalance}");
-                        break;
+
+                        if((user.accountBalance - withdrawAmount) < 0)
+                            Console.WriteLine("Not enough money!");
+                        else
+                        {
+                            user.Withdraw(withdrawAmount);
+                            Console.WriteLine($"New account balance is {user.accountBalance}");
+                            break;
+                        }
+                        
                     }
 
                 }

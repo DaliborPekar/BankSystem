@@ -8,11 +8,13 @@ namespace BankSystem
     {
         public string name;
         public double accountBalance;
+        public int userID;
 
-        public User(string name, double accountBalance)
+        public User(string name, double accountBalance, int userID)
         {
             this.name = name;
             this.accountBalance = accountBalance;
+            this.userID = userID;
         }
 
         public void AddBalance(double balance)
