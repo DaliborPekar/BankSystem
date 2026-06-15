@@ -21,7 +21,7 @@ namespace BankSystem
         {
             accountBalance += balance;
         }
-
+        
         public void Withdraw(double amount)
         {
             accountBalance -= amount;

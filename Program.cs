@@ -1,4 +1,7 @@
-﻿namespace BankSystem
+﻿using System.Net.Http.Headers;
+using System.Security.Cryptography.X509Certificates;
+
+namespace BankSystem
 {
     internal class Program
     {
@@ -8,85 +11,222 @@
             Random rand = new Random();
 
             List<User> users = new List<User>();
-           
-            bool addUsers = true;
 
-            
+            bool mainMenu = true;
 
-            while(addUsers)
+            int menuSelect = 0;
+
+
+
+
+
+            while (mainMenu)
             {
-                Console.Write("Enter the name: \n");
-                string name = Console.ReadLine();
-
-                Console.Write("Enter the accountBalance: \n");
-                double accountBalance = Convert.ToDouble(Console.ReadLine());
-
-                int userID = rand.Next(10, 100);
-
-                User user = new User(name, accountBalance, userID);
-                Console.WriteLine($"{user.name} {user.accountBalance} {user.userID}");
-                users.Add(user);
-                Console.WriteLine("Do you want to continue adding new users?");
-                string temp = Console.ReadLine().ToLower();
-
-                addUsers = (temp == "y") ? true : false;
-            }
-            bool addBalance = true;
-
-            while(addBalance)
-            {
-                Console.WriteLine("Enter the full name: ");
-                string fullname = Console.ReadLine();
-                foreach (User user in users)
+                Console.WriteLine("Select mode: ");
+                menuSelect = Convert.ToInt32(Console.ReadLine());
+                switch (menuSelect)
                 {
-                    if(user.name == fullname)
-                    {
-                        Console.WriteLine("Enter amount to add to the balance:");
-                        double addAmount = Convert.ToDouble(Console.ReadLine());
-                        user.AddBalance(addAmount);
-                        Console.WriteLine($"New account balance is {user.accountBalance}");
+                    case (1):
+                        AccountCreation();
                         break;
-                    }
-                    
+
+                    case (2):
+                        Deposit();
+                        break;
+
+                    case (3):
+                        Withdraw();
+                        break;
+                    case (4):
+                        Balance();
+                        break;
                 }
-                Console.WriteLine("Do you want to continue adding to the balance?");
-                string temp = Console.ReadLine().ToLower();
-                addBalance = (temp == "y") ? true : false;
             }
 
-            bool withdraw = true;
 
-            while (withdraw)
+
+
+
+
+
+
+            void AccountCreation()
             {
-                Console.WriteLine("Enter the full name: ");
-                string fullname = Console.ReadLine();
-                foreach (User user in users)
-                {
-                    if (user.name == fullname)
-                    {
-                        Console.WriteLine("Enter amount to withdraw:");
-                        double withdrawAmount = Convert.ToDouble(Console.ReadLine());
+                bool addUsers = true;
 
-                        if((user.accountBalance - withdrawAmount) < 0)
-                            Console.WriteLine("Not enough money!");
+                while (addUsers)
+                {
+                    Console.Write("Enter the name: \n");
+                    string name = Console.ReadLine();
+
+                    bool gotInput = false;
+
+                    double accountBalance = 0;
+
+                    while (!gotInput)
+                    {
+                        try
+                        {
+                            Console.Write("Enter the accountBalance: \n");
+                            accountBalance = Convert.ToDouble(Console.ReadLine());
+                            gotInput = true;
+                        }
+                        catch (FormatException)
+                        {
+                            Console.WriteLine("Please enter a number");
+                        }
+                    }
+
+
+
+                    int userID = rand.Next(10, 100);
+
+                    User user = new User(name, accountBalance, userID);
+                    Console.WriteLine($"{user.name} {user.accountBalance} {user.userID}");
+                    users.Add(user);
+                    Console.WriteLine("Do you want to continue adding new users?");
+                    string temp = Console.ReadLine().ToLower();
+
+                    addUsers = (temp == "y") ? true : false;
+                }
+            }
+
+
+            void Deposit()
+            {
+                bool addBalance = true;
+                double addAmount = 0;
+
+                while (addBalance)
+                {
+
+                    Console.WriteLine("Enter the full name: ");
+                    string fullname = Console.ReadLine();
+
+                    bool userFound = false;
+                    foreach (User user in users)
+                    {
+                        int x = 1;
+                        x++;
+                        if (user.name == fullname)
+                        {
+                            bool gotInput = false;
+
+                            while (!gotInput)
+                            {
+
+                                try
+                                {
+                                    Console.WriteLine("Enter amount to add to the balance:");
+                                    addAmount = Convert.ToDouble(Console.ReadLine());
+                                    user.AddBalance(addAmount);
+                                    Console.WriteLine($"New account balance is {user.accountBalance}");
+                                    gotInput = true;
+
+                                    Console.WriteLine("Do you want to continue adding to the balance?");
+                                    string temp = Console.ReadLine().ToLower();
+                                    addBalance = (temp == "y") ? true : false;
+                                    userFound = true;
+
+                                }
+                                catch (FormatException)
+                                {
+                                    Console.WriteLine("Please enter a number");
+                                }
+
+                            }
+                        }
+                        else if(!userFound && x == users.Count)
+                        {
+                            Console.WriteLine("That user doesnt exist! Try again!");
+                            addBalance = true;
+                        }
+
+                    }
+
+                }
+            }
+
+
+            void Withdraw()
+            {
+                bool withdraw = true;
+
+                while (withdraw)
+                {
+                    Console.WriteLine("Enter the full name: ");
+                    string fullname = Console.ReadLine();
+                    foreach (User user in users)
+                    {
+                        if (user.name == fullname)
+                        {
+                            try
+                            {
+                                Console.WriteLine("Enter amount to withdraw:");
+                                double withdrawAmount = Convert.ToDouble(Console.ReadLine());
+
+                                if ((user.accountBalance - withdrawAmount) < 0)
+                                    Console.WriteLine("Not enough money!");
+                                else
+                                {
+                                    user.Withdraw(withdrawAmount);
+                                    Console.WriteLine($"New account balance is {user.accountBalance}");
+
+                                }
+
+                                Console.WriteLine("Do you want to continue withdrawing?");
+                                string temp = Console.ReadLine().ToLower();
+                                withdraw = (temp == "y") ? true : false;
+                            }
+                            catch (FormatException)
+                            {
+                                Console.WriteLine("Please enter a number!");
+
+                            }
+
+                        }
                         else
                         {
-                            user.Withdraw(withdrawAmount);
-                            Console.WriteLine($"New account balance is {user.accountBalance}");
-                            break;
+                            Console.WriteLine("That user doesnt exist! Try again!");
+                            withdraw = true;
                         }
-                        
+
                     }
 
                 }
-                Console.WriteLine("Do you want to continue withdrawing?");
-                string temp = Console.ReadLine().ToLower();
-                withdraw = (temp == "y") ? true : false;
             }
 
+            void Balance()
+            {
+                bool balance = true;
+
+                while (balance)
+                {
+                    Console.WriteLine("Enter the full name: ");
+                    string fullname = Console.ReadLine();
+                    foreach (User user in users)
+                    {
+                        if (user.name == fullname)
+                        {
+
+                            Console.WriteLine($"Account balance: {user.accountBalance}");
+
+                            Console.WriteLine("Do you want to check another user?");
+                            string temp = Console.ReadLine().ToLower();
+                            balance = (temp == "y") ? true : false;
 
 
-           
+                        }
+                        else
+                        {
+                            Console.WriteLine("That user doesnt exist! Try again!");
+                            balance = true;
+                        }
+
+                    }
+
+                }
+            }
 
         }
     }
