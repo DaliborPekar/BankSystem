@@ -16,10 +16,6 @@ namespace BankSystem
 
             int menuSelect = 0;
 
-
-
-
-
             while (mainMenu)
             {
                 Console.WriteLine("Select mode: ");
@@ -42,13 +38,6 @@ namespace BankSystem
                         break;
                 }
             }
-
-
-
-
-
-
-
 
             void AccountCreation()
             {
@@ -77,8 +66,6 @@ namespace BankSystem
                         }
                     }
 
-
-
                     int userID = rand.Next(10, 100);
 
                     User user = new User(name, accountBalance, userID);
@@ -91,7 +78,6 @@ namespace BankSystem
                 }
             }
 
-
             void Deposit()
             {
                 bool addBalance = true;
@@ -103,51 +89,48 @@ namespace BankSystem
                     Console.WriteLine("Enter the full name: ");
                     string fullname = Console.ReadLine();
 
-                    bool userFound = false;
-                    foreach (User user in users)
-                    {
-                        int x = 1;
-                        x++;
-                        if (user.name == fullname)
-                        {
-                            bool gotInput = false;
 
-                            while (!gotInput)
+                    User user = checkUser(fullname);
+
+
+                    if (user == null)
+                    {
+                        Console.WriteLine("That user doesnt exist! Try again!");
+                        addBalance = true;
+                    }
+
+                    else
+                    {
+                        bool gotInput = false;
+
+                        while (!gotInput)
+                        {
+
+                            try
                             {
 
-                                try
-                                {
-                                    Console.WriteLine("Enter amount to add to the balance:");
-                                    addAmount = Convert.ToDouble(Console.ReadLine());
-                                    user.AddBalance(addAmount);
-                                    Console.WriteLine($"New account balance is {user.accountBalance}");
-                                    gotInput = true;
+                                Console.WriteLine("Enter amount to add to the balance:");
+                                addAmount = Convert.ToDouble(Console.ReadLine());
+                                user.AddBalance(addAmount);
+                                Console.WriteLine($"New account balance is {user.accountBalance}");
+                                gotInput = true;
 
-                                    Console.WriteLine("Do you want to continue adding to the balance?");
-                                    string temp = Console.ReadLine().ToLower();
-                                    addBalance = (temp == "y") ? true : false;
-                                    userFound = true;
+                                Console.WriteLine("Do you want to continue adding to the balance?");
+                                string temp = Console.ReadLine().ToLower();
+                                addBalance = (temp == "y") ? true : false;
 
-                                }
-                                catch (FormatException)
-                                {
-                                    Console.WriteLine("Please enter a number");
-                                }
 
                             }
-                        }
-                        else if(!userFound && x == users.Count)
-                        {
-                            Console.WriteLine("That user doesnt exist! Try again!");
-                            addBalance = true;
+                            catch (FormatException)
+                            {
+                                Console.WriteLine("Please enter a number");
+                            }
+
                         }
 
                     }
-
                 }
             }
-
-
             void Withdraw()
             {
                 bool withdraw = true;
@@ -156,78 +139,79 @@ namespace BankSystem
                 {
                     Console.WriteLine("Enter the full name: ");
                     string fullname = Console.ReadLine();
-                    foreach (User user in users)
+
+                    User user = checkUser(fullname);
+
+                    if (user == null)
                     {
-                        if (user.name == fullname)
-                        {
-                            try
-                            {
-                                Console.WriteLine("Enter amount to withdraw:");
-                                double withdrawAmount = Convert.ToDouble(Console.ReadLine());
-
-                                if ((user.accountBalance - withdrawAmount) < 0)
-                                    Console.WriteLine("Not enough money!");
-                                else
-                                {
-                                    user.Withdraw(withdrawAmount);
-                                    Console.WriteLine($"New account balance is {user.accountBalance}");
-
-                                }
-
-                                Console.WriteLine("Do you want to continue withdrawing?");
-                                string temp = Console.ReadLine().ToLower();
-                                withdraw = (temp == "y") ? true : false;
-                            }
-                            catch (FormatException)
-                            {
-                                Console.WriteLine("Please enter a number!");
-
-                            }
-
-                        }
-                        else
-                        {
-                            Console.WriteLine("That user doesnt exist! Try again!");
-                            withdraw = true;
-                        }
-
+                        Console.WriteLine("That user doesnt exist! Try again!");
+                        withdraw = true;
                     }
+                    else
+                    {
+                        try
+                        {
+                            Console.WriteLine("Enter amount to withdraw:");
+                            double withdrawAmount = Convert.ToDouble(Console.ReadLine());
 
+                            if ((user.accountBalance - withdrawAmount) < 0)
+                                Console.WriteLine("Not enough money!");
+                            else
+                            {
+                                user.Withdraw(withdrawAmount);
+                                Console.WriteLine($"New account balance is {user.accountBalance}");
+                            }
+                            Console.WriteLine("Do you want to continue withdrawing?");
+                            string temp = Console.ReadLine().ToLower();
+                            withdraw = (temp == "y") ? true : false;
+                        }
+                        catch (FormatException)
+                        {
+                            Console.WriteLine("Please enter a number!");
+                        }
+                    }
                 }
             }
-
             void Balance()
             {
                 bool balance = true;
 
                 while (balance)
                 {
+
                     Console.WriteLine("Enter the full name: ");
                     string fullname = Console.ReadLine();
-                    foreach (User user in users)
+
+                    User user = checkUser(fullname);
+
+                    if (user == null)
                     {
-                        if (user.name == fullname)
-                        {
+                        Console.WriteLine("That user doesnt exist! Try again!");
+                        balance = true;
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Account balance: {user.accountBalance}");
 
-                            Console.WriteLine($"Account balance: {user.accountBalance}");
+                        Console.WriteLine("Do you want to check another user?");
 
-                            Console.WriteLine("Do you want to check another user?");
-                            string temp = Console.ReadLine().ToLower();
-                            balance = (temp == "y") ? true : false;
-
-
-                        }
-                        else
-                        {
-                            Console.WriteLine("That user doesnt exist! Try again!");
-                            balance = true;
-                        }
-
+                        string temp = Console.ReadLine().ToLower();
+                        balance = (temp == "y") ? true : false;
                     }
 
                 }
             }
-
+            User checkUser(string fullname)
+            {
+                foreach (User user in users)
+                {
+                    if (user.name == fullname)
+                    {
+                        return user;
+                    }
+                }
+                return null;
+            }
         }
     }
 }
