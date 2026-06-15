@@ -36,6 +36,13 @@ namespace BankSystem
                     case (4):
                         Balance();
                         break;
+                    case (5):
+                        accountList();
+                        break;
+                    default:
+                        mainMenu = false;
+                        break;
+
                 }
             }
 
@@ -86,7 +93,7 @@ namespace BankSystem
                 while (addBalance)
                 {
 
-                    Console.WriteLine("Enter the full name: ");
+                    Console.WriteLine("Enter the full name or userID: ");
                     string fullname = Console.ReadLine();
 
 
@@ -137,7 +144,7 @@ namespace BankSystem
 
                 while (withdraw)
                 {
-                    Console.WriteLine("Enter the full name: ");
+                    Console.WriteLine("Enter the full name or userID: ");
                     string fullname = Console.ReadLine();
 
                     User user = checkUser(fullname);
@@ -179,7 +186,7 @@ namespace BankSystem
                 while (balance)
                 {
 
-                    Console.WriteLine("Enter the full name: ");
+                    Console.WriteLine("Enter the full name or userID: ");
                     string fullname = Console.ReadLine();
 
                     User user = checkUser(fullname);
@@ -201,6 +208,17 @@ namespace BankSystem
 
                 }
             }
+
+
+            void accountList()
+            {
+                foreach(User user in users)
+                {
+                    Console.WriteLine($"{user.name} {user.accountBalance} {user.userID}");
+                }
+            }
+
+
             User checkUser(string fullname)
             {
                 foreach (User user in users)
@@ -209,6 +227,18 @@ namespace BankSystem
                     {
                         return user;
                     }
+                    try
+                    {
+                        if (user.userID == Convert.ToInt32(fullname))
+                        {
+                            return user;
+                        }
+                    }
+                    catch(FormatException)
+                    {
+                       
+                    }
+                    
                 }
                 return null;
             }
