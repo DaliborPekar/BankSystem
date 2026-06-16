@@ -39,6 +39,9 @@ namespace BankSystem
                     case (5):
                         accountList();
                         break;
+                    case (6):
+                        transfer();
+                        break;
                     default:
                         mainMenu = false;
                         break;
@@ -212,10 +215,84 @@ namespace BankSystem
 
             void accountList()
             {
-                foreach(User user in users)
+                foreach (User user in users)
                 {
                     Console.WriteLine($"{user.name} {user.accountBalance} {user.userID}");
                 }
+            }
+
+
+            void transfer()
+            {
+                bool transfer = true;
+                while (transfer)
+                {
+                    Console.WriteLine("Enter the first full name or userID: ");
+                    string fullname1 = Console.ReadLine();
+
+                    User user1 = checkUser(fullname1);
+
+                    Console.WriteLine("Enter the second full name or userID: ");
+                    string fullname2 = Console.ReadLine();
+
+                    User user2 = checkUser(fullname2);
+
+
+                    if (user1 == null || user2 == null)
+                    {
+                        Console.WriteLine("That user doesnt exist! Try again!");
+
+                    }
+                    else
+                    {
+
+
+                        double transferAmount = 0;
+
+                        bool gotInput = false;
+                        while (!gotInput)
+                        {
+                            try
+                            {
+                                Console.WriteLine("Enter transfer amount: ");
+                                transferAmount = Convert.ToDouble(Console.ReadLine());
+                                gotInput = true;
+                            }
+                            catch (FormatException)
+                            {
+                                Console.WriteLine("Please enter a number!");
+                            }
+                        }
+
+
+                        if ((user1.accountBalance - transferAmount) < 0)
+                        {
+                            Console.WriteLine("Not enough money!");
+                            Console.WriteLine("Do you want to try again transfer?");
+                            string temp = Console.ReadLine();
+                            transfer = (temp == "y") ? true : false;
+                        }
+
+
+                        else
+                        {
+                            user1.Withdraw(transferAmount);
+
+                            user2.AddBalance(transferAmount);
+
+                            Console.WriteLine(user1.accountBalance);
+
+                            Console.WriteLine(user2.accountBalance);
+
+                            Console.WriteLine("Do you want to make a new transfer?");
+                            string temp = Console.ReadLine();
+                            transfer = (temp == "y") ? true : false;
+                        }
+                    }
+
+
+                }
+
             }
 
 
@@ -234,11 +311,10 @@ namespace BankSystem
                             return user;
                         }
                     }
-                    catch(FormatException)
+                    catch (FormatException)
                     {
-                       
+
                     }
-                    
                 }
                 return null;
             }
