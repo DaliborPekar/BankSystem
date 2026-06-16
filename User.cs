@@ -6,25 +6,37 @@ namespace BankSystem
 {
     internal class User
     {
-        public string name;
-        public double accountBalance;
-        public int userID;
+        //private string name;
+        //private double accountBalance;
+        //private int userID;
 
         public User(string name, double accountBalance, int userID)
         {
-            this.name = name;
-            this.accountBalance = accountBalance;
-            this.userID = userID;
+            this.Name = name;
+            this.AccountBalance = accountBalance;
+            this.UserID = userID;
         }
+
+        public string Name { get; set; }
+
+        public double AccountBalance { get; set; }
+
+        public int UserID { get; set; }
+
+
+        
+
+
+
 
         public void AddBalance(double balance)
         {
-            accountBalance += balance;
+            AccountBalance += balance;
         }
         
         public void Withdraw(double amount)
         {
-            accountBalance -= amount;
+            AccountBalance -= amount;
         }
 
     }

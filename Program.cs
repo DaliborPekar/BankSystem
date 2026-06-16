@@ -79,7 +79,7 @@ namespace BankSystem
                     int userID = rand.Next(10, 100);
 
                     User user = new User(name, accountBalance, userID);
-                    Console.WriteLine($"{user.name} {user.accountBalance} {user.userID}");
+                    Console.WriteLine($"{user.Name} {user.AccountBalance} {user.UserID}");
                     users.Add(user);
                     Console.WriteLine("Do you want to continue adding new users?");
                     string temp = Console.ReadLine().ToLower();
@@ -122,7 +122,7 @@ namespace BankSystem
                                 Console.WriteLine("Enter amount to add to the balance:");
                                 addAmount = Convert.ToDouble(Console.ReadLine());
                                 user.AddBalance(addAmount);
-                                Console.WriteLine($"New account balance is {user.accountBalance}");
+                                Console.WriteLine($"New account balance is {user.AccountBalance}");
                                 gotInput = true;
 
                                 Console.WriteLine("Do you want to continue adding to the balance?");
@@ -164,12 +164,12 @@ namespace BankSystem
                             Console.WriteLine("Enter amount to withdraw:");
                             double withdrawAmount = Convert.ToDouble(Console.ReadLine());
 
-                            if ((user.accountBalance - withdrawAmount) < 0)
+                            if ((user.AccountBalance - withdrawAmount) < 0)
                                 Console.WriteLine("Not enough money!");
                             else
                             {
                                 user.Withdraw(withdrawAmount);
-                                Console.WriteLine($"New account balance is {user.accountBalance}");
+                                Console.WriteLine($"New account balance is {user.AccountBalance}");
                             }
                             Console.WriteLine("Do you want to continue withdrawing?");
                             string temp = Console.ReadLine().ToLower();
@@ -201,7 +201,7 @@ namespace BankSystem
                     }
                     else
                     {
-                        Console.WriteLine($"Account balance: {user.accountBalance}");
+                        Console.WriteLine($"Account balance: {user.AccountBalance}");
 
                         Console.WriteLine("Do you want to check another user?");
 
@@ -217,7 +217,7 @@ namespace BankSystem
             {
                 foreach (User user in users)
                 {
-                    Console.WriteLine($"{user.name} {user.accountBalance} {user.userID}");
+                    Console.WriteLine($"{user.Name} {user.AccountBalance} {user.UserID}");
                 }
             }
 
@@ -265,7 +265,7 @@ namespace BankSystem
                         }
 
 
-                        if ((user1.accountBalance - transferAmount) < 0)
+                        if ((user1.AccountBalance - transferAmount) < 0)
                         {
                             Console.WriteLine("Not enough money!");
                             Console.WriteLine("Do you want to try again transfer?");
@@ -280,9 +280,9 @@ namespace BankSystem
 
                             user2.AddBalance(transferAmount);
 
-                            Console.WriteLine(user1.accountBalance);
+                            Console.WriteLine(user1.AccountBalance);
 
-                            Console.WriteLine(user2.accountBalance);
+                            Console.WriteLine(user2.AccountBalance);
 
                             Console.WriteLine("Do you want to make a new transfer?");
                             string temp = Console.ReadLine();
@@ -300,13 +300,13 @@ namespace BankSystem
             {
                 foreach (User user in users)
                 {
-                    if (user.name == fullname)
+                    if (user.Name == fullname)
                     {
                         return user;
                     }
                     try
                     {
-                        if (user.userID == Convert.ToInt32(fullname))
+                        if (user.UserID == Convert.ToInt32(fullname))
                         {
                             return user;
                         }
