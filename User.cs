@@ -15,6 +15,12 @@ namespace BankSystem
             this.Name = name;
             this.AccountBalance = accountBalance;
             this.UserID = userID;
+
+           
+
+            
+
+
         }
 
         public string Name { get; set; }

@@ -1,5 +1,6 @@
 ﻿using System.Net.Http.Headers;
 using System.Security.Cryptography.X509Certificates;
+using System.Xml.Linq;
 
 namespace BankSystem
 {
@@ -11,6 +12,66 @@ namespace BankSystem
             Random rand = new Random();
 
             List<User> users = new List<User>();
+
+            if (File.Exists("test.csp"))
+            {
+
+                Console.WriteLine("Loading data initialized!");
+                string[] x = File.ReadAllLines("test.csp");
+
+
+
+                foreach (string y in x)
+                {
+                    string l = "";
+                    string p = "";
+                    string o = "";
+                    int checker = 0;
+                    string g = y;
+                    while (checker != 4)
+                    {
+                        int i = g.IndexOf(",");
+                        int startIndex = 0;
+                        int endIndex = i;
+
+
+
+
+                        string tempName = "";
+
+                        for (int k = startIndex; k < endIndex; k++)
+                        {
+                            tempName += (g[k]);
+
+                        }
+                        checker++;
+
+                        g = g.Remove(startIndex, endIndex + 1);
+                        startIndex = endIndex + 1;
+                        if (checker == 1)
+                        {
+                            l = tempName;
+
+                        }
+                        else if (checker == 2)
+                        {
+
+                            p = tempName;
+
+                        }
+                        else if (checker == 3)
+                        {
+
+                            o = tempName;
+                        }
+                    }
+                    User user = new User(l, Convert.ToDouble(p), Convert.ToInt32(o));
+                    users.Add(user);
+
+                }
+
+            }
+
 
             bool mainMenu = true;
 
@@ -52,7 +113,7 @@ namespace BankSystem
             void AccountCreation()
             {
                 bool addUsers = true;
-
+                List<string> userData = new List<string>();
                 while (addUsers)
                 {
                     Console.Write("Enter the name: \n");
@@ -81,11 +142,17 @@ namespace BankSystem
                     User user = new User(name, accountBalance, userID);
                     Console.WriteLine($"{user.Name} {user.AccountBalance} {user.UserID}");
                     users.Add(user);
+                    userData.Add($"{user.Name},{user.AccountBalance},{user.UserID},");
                     Console.WriteLine("Do you want to continue adding new users?");
                     string temp = Console.ReadLine().ToLower();
 
                     addUsers = (temp == "y") ? true : false;
                 }
+
+                File.WriteAllLines("test.csp", userData);
+
+
+
             }
 
             void Deposit()
