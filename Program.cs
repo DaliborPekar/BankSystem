@@ -13,6 +13,8 @@ namespace BankSystem
 
             List<User> users = new List<User>();
 
+            List<string> userData = new List<string>();
+
             if (File.Exists("test.csp"))
             {
 
@@ -103,6 +105,9 @@ namespace BankSystem
                     case (6):
                         transfer();
                         break;
+                    case (7):
+                        mainMenu = false;
+                        break;
                     default:
                         mainMenu = false;
                         break;
@@ -113,7 +118,7 @@ namespace BankSystem
             void AccountCreation()
             {
                 bool addUsers = true;
-                List<string> userData = new List<string>();
+               
                 while (addUsers)
                 {
                     Console.Write("Enter the name: \n");
@@ -149,9 +154,7 @@ namespace BankSystem
                     addUsers = (temp == "y") ? true : false;
                 }
 
-                File.WriteAllLines("test.csp", userData);
-
-
+                userData.Clear();
 
             }
 
@@ -362,7 +365,6 @@ namespace BankSystem
 
             }
 
-
             User checkUser(string fullname)
             {
                 foreach (User user in users)
@@ -385,6 +387,20 @@ namespace BankSystem
                 }
                 return null;
             }
+
+            Console.WriteLine("Saving data");
+
+            Console.ReadKey();
+
+            foreach(User user in users)
+            {
+                userData.Add($"{user.Name},{user.AccountBalance},{user.UserID},");
+                
+                
+            }
+  
+            File.WriteAllLines("test.csp", userData);
+
         }
     }
 }
