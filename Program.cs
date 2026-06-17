@@ -1,6 +1,6 @@
-﻿using System.Net.Http.Headers;
-using System.Security.Cryptography.X509Certificates;
-using System.Xml.Linq;
+﻿// <copyright file="Program.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
 
 namespace BankSystem
 {
@@ -23,9 +23,9 @@ namespace BankSystem
 
                 foreach (string y in x)
                 {
-                    string l = "";
-                    string p = "";
-                    string o = "";
+                    string l = string.Empty;
+                    string p = string.Empty;
+                    string o = string.Empty;
                     int checker = 0;
                     string g = y;
                     while (checker != 4)
@@ -34,13 +34,13 @@ namespace BankSystem
                         int startIndex = 0;
                         int endIndex = i;
 
-                        string tempName = "";
+                        string tempName = string.Empty;
 
                         for (int k = startIndex; k < endIndex; k++)
                         {
-                            tempName += (g[k]);
-
+                            tempName += g[k];
                         }
+
                         checker++;
 
                         g = g.Remove(startIndex, endIndex + 1);
@@ -48,26 +48,21 @@ namespace BankSystem
                         if (checker == 1)
                         {
                             l = tempName;
-
                         }
                         else if (checker == 2)
                         {
-
                             p = tempName;
-
                         }
                         else if (checker == 3)
                         {
-
                             o = tempName;
                         }
                     }
+
                     User user = new User(l, Convert.ToDouble(p), Convert.ToInt32(o));
                     users.Add(user);
                     userDict[user.UserID] = user;
-
                 }
-
             }
 
             bool mainMenu = true;
@@ -80,33 +75,32 @@ namespace BankSystem
                 menuSelect = Convert.ToInt32(Console.ReadLine());
                 switch (menuSelect)
                 {
-                    case (1):
+                    case 1:
                         AccountCreation();
                         break;
 
-                    case (2):
+                    case 2:
                         Deposit();
                         break;
 
-                    case (3):
+                    case 3:
                         Withdraw();
                         break;
-                    case (4):
+                    case 4:
                         Balance();
                         break;
-                    case (5):
-                        accountList();
+                    case 5:
+                        AccountList();
                         break;
-                    case (6):
-                        transfer();
+                    case 6:
+                        Transfer();
                         break;
-                    case (7):
+                    case 7:
                         mainMenu = false;
                         break;
                     default:
                         mainMenu = false;
                         break;
-
                 }
             }
 
@@ -163,7 +157,7 @@ namespace BankSystem
                 {
 
                     bool gotInput = false;
-                    User user = null;
+                    User? user = null;
 
                     while (!gotInput)
                     {
@@ -174,22 +168,21 @@ namespace BankSystem
 
                         if (int.TryParse(input, out userID))
                         {
-                            user = checkUser(userID);
+                            user = CheckUser(userID);
                             gotInput = true;
                         }
                         else
+                        {
                             Console.WriteLine("Enter the number!!\n");
+                        }
                     }
-
 
                     gotInput = false;
 
                     while (!gotInput)
                     {
-
                         try
                         {
-
                             Console.WriteLine("Enter amount to add to the balance:");
                             addAmount = Convert.ToDouble(Console.ReadLine());
                             user.AddBalance(addAmount);
@@ -199,19 +192,15 @@ namespace BankSystem
                             Console.WriteLine("Do you want to continue adding to the balance?");
                             string temp = Console.ReadLine().ToLower();
                             addBalance = (temp == "y") ? true : false;
-
-
                         }
                         catch (FormatException)
                         {
                             Console.WriteLine("Please enter a number");
                         }
-
                     }
-
-
                 }
             }
+
             void Withdraw()
             {
                 bool withdraw = true;
@@ -219,7 +208,7 @@ namespace BankSystem
                 while (withdraw)
                 {
                     bool gotInput = false;
-                    User user = null;
+                    User? user = null;
 
                     while (!gotInput)
                     {
@@ -230,11 +219,13 @@ namespace BankSystem
 
                         if (int.TryParse(input, out userID))
                         {
-                            user = checkUser(userID);
+                            user = CheckUser(userID);
                             gotInput = true;
                         }
                         else
+                        {
                             Console.WriteLine("Enter the number!!\n");
+                        }
                     }
 
                     try
@@ -243,7 +234,9 @@ namespace BankSystem
                         double withdrawAmount = Convert.ToDouble(Console.ReadLine());
 
                         if ((user.AccountBalance - withdrawAmount) < 0)
+                        {
                             Console.WriteLine("Not enough money!");
+                        }
                         else
                         {
                             user.Withdraw(withdrawAmount);
@@ -257,9 +250,9 @@ namespace BankSystem
                     {
                         Console.WriteLine("Please enter a number!");
                     }
-
                 }
             }
+
             void Balance()
             {
                 bool balance = true;
@@ -267,7 +260,7 @@ namespace BankSystem
                 while (balance)
                 {
                     bool gotInput = false;
-                    User user = null;
+                    User? user = null;
 
                     while (!gotInput)
                     {
@@ -278,11 +271,13 @@ namespace BankSystem
 
                         if (int.TryParse(input, out userID))
                         {
-                            user = checkUser(userID);
+                            user = CheckUser(userID);
                             gotInput = true;
                         }
                         else
+                        {
                             Console.WriteLine("Enter the number!!\n");
+                        }
                     }
 
                     Console.WriteLine($"Account balance: {user.AccountBalance}");
@@ -291,13 +286,10 @@ namespace BankSystem
 
                     string temp = Console.ReadLine().ToLower();
                     balance = (temp == "y") ? true : false;
-
-
                 }
             }
 
-
-            void accountList()
+            void AccountList()
             {
                 foreach (User user in users)
                 {
@@ -305,16 +297,14 @@ namespace BankSystem
                 }
             }
 
-
-            void transfer()
+            void Transfer()
             {
                 bool transfer = true;
                 while (transfer)
-
                 {
                     bool gotInput = false;
-                    User user1 = null;
-                    User user2 = null;
+                    User? user1 = null;
+                    User? user2 = null;
                     while (!gotInput)
                     {
                         Console.WriteLine("Enter the first userID: ");
@@ -324,11 +314,13 @@ namespace BankSystem
 
                         if (int.TryParse(input1, out userID))
                         {
-                            user1 = checkUser(userID);
+                            user1 = CheckUser(userID);
                             gotInput = true;
                         }
                         else
+                        {
                             Console.WriteLine("Enter the number!!\n");
+                        }
                     }
 
                     gotInput = false;
@@ -342,11 +334,13 @@ namespace BankSystem
 
                         if (int.TryParse(input2, out userID))
                         {
-                            user2 = checkUser(userID);
+                            user2 = CheckUser(userID);
                             gotInput = true;
                         }
                         else
+                        {
                             Console.WriteLine("Enter the number!!\n");
+                        }
                     }
 
                     double transferAmount = 0;
@@ -373,7 +367,6 @@ namespace BankSystem
                         string temp = Console.ReadLine();
                         transfer = (temp == "y") ? true : false;
                     }
-
                     else
                     {
                         user1.Withdraw(transferAmount);
@@ -389,15 +382,15 @@ namespace BankSystem
                         transfer = (temp == "y") ? true : false;
                     }
                 }
-
             }
 
-            User checkUser(int userID)
+            User? CheckUser(int userID)
             {
                 if (userDict.ContainsKey(userID))
                 {
                     return userDict[userID];
                 }
+
                 return null;
             }
 
@@ -409,12 +402,9 @@ namespace BankSystem
             foreach (User user in users)
             {
                 userData.Add($"{user.Name},{user.AccountBalance},{user.UserID},");
-
-
             }
 
             File.WriteAllLines("test.csp", userData);
-
         }
     }
 }
