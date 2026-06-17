@@ -8,7 +8,7 @@ namespace BankSystem
     {
         static void Main(string[] args)
         {
-
+            Dictionary<int, User> userDict = new Dictionary<int, User>();
             Random rand = new Random();
 
             List<User> users = new List<User>();
@@ -20,8 +20,6 @@ namespace BankSystem
 
                 Console.WriteLine("Loading data initialized!");
                 string[] x = File.ReadAllLines("test.csp");
-
-
 
                 foreach (string y in x)
                 {
@@ -35,9 +33,6 @@ namespace BankSystem
                         int i = g.IndexOf(",");
                         int startIndex = 0;
                         int endIndex = i;
-
-
-
 
                         string tempName = "";
 
@@ -69,11 +64,11 @@ namespace BankSystem
                     }
                     User user = new User(l, Convert.ToDouble(p), Convert.ToInt32(o));
                     users.Add(user);
+                    userDict[user.UserID] = user;
 
                 }
 
             }
-
 
             bool mainMenu = true;
 
@@ -118,7 +113,7 @@ namespace BankSystem
             void AccountCreation()
             {
                 bool addUsers = true;
-               
+
                 while (addUsers)
                 {
                     Console.Write("Enter the name: \n");
@@ -148,6 +143,7 @@ namespace BankSystem
                     Console.WriteLine($"{user.Name} {user.AccountBalance} {user.UserID}");
                     users.Add(user);
                     userData.Add($"{user.Name},{user.AccountBalance},{user.UserID},");
+                    userDict[user.UserID] = user;
                     Console.WriteLine("Do you want to continue adding new users?");
                     string temp = Console.ReadLine().ToLower();
 
@@ -166,49 +162,54 @@ namespace BankSystem
                 while (addBalance)
                 {
 
-                    Console.WriteLine("Enter the full name or userID: ");
-                    string fullname = Console.ReadLine();
+                    bool gotInput = false;
+                    User user = null;
 
-
-                    User user = checkUser(fullname);
-
-
-                    if (user == null)
+                    while (!gotInput)
                     {
-                        Console.WriteLine("That user doesnt exist! Try again!");
-                        addBalance = true;
+                        Console.WriteLine("Enter the first userID: ");
+                        string input = Console.ReadLine();
+
+                        int userID;
+
+                        if (int.TryParse(input, out userID))
+                        {
+                            user = checkUser(userID);
+                            gotInput = true;
+                        }
+                        else
+                            Console.WriteLine("Enter the number!!\n");
                     }
 
-                    else
-                    {
-                        bool gotInput = false;
 
-                        while (!gotInput)
+                    gotInput = false;
+
+                    while (!gotInput)
+                    {
+
+                        try
                         {
 
-                            try
-                            {
+                            Console.WriteLine("Enter amount to add to the balance:");
+                            addAmount = Convert.ToDouble(Console.ReadLine());
+                            user.AddBalance(addAmount);
+                            Console.WriteLine($"New account balance is {user.AccountBalance}");
+                            gotInput = true;
 
-                                Console.WriteLine("Enter amount to add to the balance:");
-                                addAmount = Convert.ToDouble(Console.ReadLine());
-                                user.AddBalance(addAmount);
-                                Console.WriteLine($"New account balance is {user.AccountBalance}");
-                                gotInput = true;
-
-                                Console.WriteLine("Do you want to continue adding to the balance?");
-                                string temp = Console.ReadLine().ToLower();
-                                addBalance = (temp == "y") ? true : false;
+                            Console.WriteLine("Do you want to continue adding to the balance?");
+                            string temp = Console.ReadLine().ToLower();
+                            addBalance = (temp == "y") ? true : false;
 
 
-                            }
-                            catch (FormatException)
-                            {
-                                Console.WriteLine("Please enter a number");
-                            }
-
+                        }
+                        catch (FormatException)
+                        {
+                            Console.WriteLine("Please enter a number");
                         }
 
                     }
+
+
                 }
             }
             void Withdraw()
@@ -217,39 +218,46 @@ namespace BankSystem
 
                 while (withdraw)
                 {
-                    Console.WriteLine("Enter the full name or userID: ");
-                    string fullname = Console.ReadLine();
+                    bool gotInput = false;
+                    User user = null;
 
-                    User user = checkUser(fullname);
-
-                    if (user == null)
+                    while (!gotInput)
                     {
-                        Console.WriteLine("That user doesnt exist! Try again!");
-                        withdraw = true;
-                    }
-                    else
-                    {
-                        try
-                        {
-                            Console.WriteLine("Enter amount to withdraw:");
-                            double withdrawAmount = Convert.ToDouble(Console.ReadLine());
+                        Console.WriteLine("Enter the userID: ");
+                        string input = Console.ReadLine();
 
-                            if ((user.AccountBalance - withdrawAmount) < 0)
-                                Console.WriteLine("Not enough money!");
-                            else
-                            {
-                                user.Withdraw(withdrawAmount);
-                                Console.WriteLine($"New account balance is {user.AccountBalance}");
-                            }
-                            Console.WriteLine("Do you want to continue withdrawing?");
-                            string temp = Console.ReadLine().ToLower();
-                            withdraw = (temp == "y") ? true : false;
-                        }
-                        catch (FormatException)
+                        int userID;
+
+                        if (int.TryParse(input, out userID))
                         {
-                            Console.WriteLine("Please enter a number!");
+                            user = checkUser(userID);
+                            gotInput = true;
                         }
+                        else
+                            Console.WriteLine("Enter the number!!\n");
                     }
+
+                    try
+                    {
+                        Console.WriteLine("Enter amount to withdraw:");
+                        double withdrawAmount = Convert.ToDouble(Console.ReadLine());
+
+                        if ((user.AccountBalance - withdrawAmount) < 0)
+                            Console.WriteLine("Not enough money!");
+                        else
+                        {
+                            user.Withdraw(withdrawAmount);
+                            Console.WriteLine($"New account balance is {user.AccountBalance}");
+                        }
+                        Console.WriteLine("Do you want to continue withdrawing?");
+                        string temp = Console.ReadLine().ToLower();
+                        withdraw = (temp == "y") ? true : false;
+                    }
+                    catch (FormatException)
+                    {
+                        Console.WriteLine("Please enter a number!");
+                    }
+
                 }
             }
             void Balance()
@@ -258,26 +266,32 @@ namespace BankSystem
 
                 while (balance)
                 {
+                    bool gotInput = false;
+                    User user = null;
 
-                    Console.WriteLine("Enter the full name or userID: ");
-                    string fullname = Console.ReadLine();
-
-                    User user = checkUser(fullname);
-
-                    if (user == null)
+                    while (!gotInput)
                     {
-                        Console.WriteLine("That user doesnt exist! Try again!");
-                        balance = true;
-                    }
-                    else
-                    {
-                        Console.WriteLine($"Account balance: {user.AccountBalance}");
+                        Console.WriteLine("Enter the userID: ");
+                        string input = Console.ReadLine();
 
-                        Console.WriteLine("Do you want to check another user?");
+                        int userID;
 
-                        string temp = Console.ReadLine().ToLower();
-                        balance = (temp == "y") ? true : false;
+                        if (int.TryParse(input, out userID))
+                        {
+                            user = checkUser(userID);
+                            gotInput = true;
+                        }
+                        else
+                            Console.WriteLine("Enter the number!!\n");
                     }
+
+                    Console.WriteLine($"Account balance: {user.AccountBalance}");
+
+                    Console.WriteLine("Do you want to check another user?");
+
+                    string temp = Console.ReadLine().ToLower();
+                    balance = (temp == "y") ? true : false;
+
 
                 }
             }
@@ -296,109 +310,109 @@ namespace BankSystem
             {
                 bool transfer = true;
                 while (transfer)
+
                 {
-                    Console.WriteLine("Enter the first full name or userID: ");
-                    string fullname1 = Console.ReadLine();
-
-                    User user1 = checkUser(fullname1);
-
-                    Console.WriteLine("Enter the second full name or userID: ");
-                    string fullname2 = Console.ReadLine();
-
-                    User user2 = checkUser(fullname2);
-
-
-                    if (user1 == null || user2 == null)
+                    bool gotInput = false;
+                    User user1 = null;
+                    User user2 = null;
+                    while (!gotInput)
                     {
-                        Console.WriteLine("That user doesnt exist! Try again!");
+                        Console.WriteLine("Enter the first userID: ");
+                        string input1 = Console.ReadLine();
 
+                        int userID;
+
+                        if (int.TryParse(input1, out userID))
+                        {
+                            user1 = checkUser(userID);
+                            gotInput = true;
+                        }
+                        else
+                            Console.WriteLine("Enter the number!!\n");
                     }
+
+                    gotInput = false;
+
+                    while (!gotInput)
+                    {
+                        Console.WriteLine("Enter the second userID: ");
+                        string input2 = Console.ReadLine();
+
+                        int userID;
+
+                        if (int.TryParse(input2, out userID))
+                        {
+                            user2 = checkUser(userID);
+                            gotInput = true;
+                        }
+                        else
+                            Console.WriteLine("Enter the number!!\n");
+                    }
+
+                    double transferAmount = 0;
+
+                    gotInput = false;
+                    while (!gotInput)
+                    {
+                        try
+                        {
+                            Console.WriteLine("Enter transfer amount: ");
+                            transferAmount = Convert.ToDouble(Console.ReadLine());
+                            gotInput = true;
+                        }
+                        catch (FormatException)
+                        {
+                            Console.WriteLine("Please enter a number!");
+                        }
+                    }
+
+                    if ((user1.AccountBalance - transferAmount) < 0)
+                    {
+                        Console.WriteLine("Not enough money!");
+                        Console.WriteLine("Do you want to try again transfer?");
+                        string temp = Console.ReadLine();
+                        transfer = (temp == "y") ? true : false;
+                    }
+
                     else
                     {
+                        user1.Withdraw(transferAmount);
 
+                        user2.AddBalance(transferAmount);
 
-                        double transferAmount = 0;
+                        Console.WriteLine(user1.AccountBalance);
 
-                        bool gotInput = false;
-                        while (!gotInput)
-                        {
-                            try
-                            {
-                                Console.WriteLine("Enter transfer amount: ");
-                                transferAmount = Convert.ToDouble(Console.ReadLine());
-                                gotInput = true;
-                            }
-                            catch (FormatException)
-                            {
-                                Console.WriteLine("Please enter a number!");
-                            }
-                        }
+                        Console.WriteLine(user2.AccountBalance);
 
-
-                        if ((user1.AccountBalance - transferAmount) < 0)
-                        {
-                            Console.WriteLine("Not enough money!");
-                            Console.WriteLine("Do you want to try again transfer?");
-                            string temp = Console.ReadLine();
-                            transfer = (temp == "y") ? true : false;
-                        }
-
-
-                        else
-                        {
-                            user1.Withdraw(transferAmount);
-
-                            user2.AddBalance(transferAmount);
-
-                            Console.WriteLine(user1.AccountBalance);
-
-                            Console.WriteLine(user2.AccountBalance);
-
-                            Console.WriteLine("Do you want to make a new transfer?");
-                            string temp = Console.ReadLine();
-                            transfer = (temp == "y") ? true : false;
-                        }
+                        Console.WriteLine("Do you want to make a new transfer?");
+                        string temp = Console.ReadLine();
+                        transfer = (temp == "y") ? true : false;
                     }
-
-
                 }
 
             }
 
-            User checkUser(string fullname)
+            User checkUser(int userID)
             {
-                foreach (User user in users)
+                if (userDict.ContainsKey(userID))
                 {
-                    if (user.Name == fullname)
-                    {
-                        return user;
-                    }
-                    try
-                    {
-                        if (user.UserID == Convert.ToInt32(fullname))
-                        {
-                            return user;
-                        }
-                    }
-                    catch (FormatException)
-                    {
-
-                    }
+                    return userDict[userID];
                 }
                 return null;
             }
 
+            // Saving userData
             Console.WriteLine("Saving data");
 
             Console.ReadKey();
 
-            foreach(User user in users)
+            foreach (User user in users)
             {
                 userData.Add($"{user.Name},{user.AccountBalance},{user.UserID},");
-                
-                
+
+
             }
-  
+
             File.WriteAllLines("test.csp", userData);
 
         }
