@@ -13,50 +13,17 @@ namespace BankSystem
 
             List<string> userData = new List<string>();
 
-            if (File.Exists("test.csp"))
+            if (File.Exists("users.csp"))
             {
                 Console.WriteLine("Loading data initialized!");
-                string[] x = File.ReadAllLines("test.csp");
+                string[] text = File.ReadAllLines("users.csp");
 
-                foreach (string y in x)
+                foreach (string row in text)
                 {
-                    string l = string.Empty;
-                    string p = string.Empty;
-                    string o = string.Empty;
-                    int checker = 0;
-                    string g = y;
-                    while (checker != 4)
-                    {
-                        int i = g.IndexOf(",");
-                        int startIndex = 0;
-                        int endIndex = i;
+                    string[] tokens = row.Split(",");
+                    Console.WriteLine($"{tokens[0]}, {tokens[1]}, {tokens[2]}");
 
-                        string tempName = string.Empty;
-
-                        for (int k = startIndex; k < endIndex; k++)
-                        {
-                            tempName += g[k];
-                        }
-
-                        checker++;
-
-                        g = g.Remove(startIndex, endIndex + 1);
-                        startIndex = endIndex + 1;
-                        if (checker == 1)
-                        {
-                            l = tempName;
-                        }
-                        else if (checker == 2)
-                        {
-                            p = tempName;
-                        }
-                        else if (checker == 3)
-                        {
-                            o = tempName;
-                        }
-                    }
-
-                    User user = new User(l, Convert.ToDouble(p), Convert.ToInt32(o));
+                    User user = new User(tokens[0], Convert.ToInt32(tokens[1]), Convert.ToInt32(tokens[2]));
 
                     userDict[user.UserID] = user;
                 }
@@ -134,7 +101,7 @@ namespace BankSystem
 
                     User user = new User(name, accountBalance, userID);
                     Console.WriteLine($"{user.Name} {user.AccountBalance} {user.UserID}");
-                    userData.Add($"{user.Name},{user.AccountBalance},{user.UserID},");
+
                     userDict[user.UserID] = user;
                     Console.WriteLine("Do you want to continue adding new users?");
                     string temp = Console.ReadLine().ToLower();
@@ -142,7 +109,6 @@ namespace BankSystem
                     addUsers = (temp == "y") ? true : false;
                 }
 
-                userData.Clear();
             }
 
             void Deposit()
@@ -259,11 +225,16 @@ namespace BankSystem
                             {
                                 user.Withdraw(withdrawAmount);
                                 Console.WriteLine($"New account balance is {user.AccountBalance}");
+                                gotInput = true;
+
                             }
 
                             Console.WriteLine("Do you want to continue withdrawing?");
+
                             string temp = Console.ReadLine().ToLower();
+
                             withdraw = (temp == "y") ? true : false;
+
                         }
                         else
                         {
@@ -443,15 +414,15 @@ namespace BankSystem
             // Saving userData
             Console.WriteLine("Saving data");
 
-            Console.ReadKey();
-
             foreach (var item in userDict)
             {
                 User user = item.Value;
                 userData.Add($"{user.Name},{user.AccountBalance},{user.UserID},");
             }
 
-            File.WriteAllLines("test.csp", userData);
+            File.WriteAllLines("users.csp", userData);
+
+            Console.ReadKey();
         }
     }
 }
