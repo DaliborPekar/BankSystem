@@ -87,21 +87,31 @@
             {
                 Console.Write("Enter the name: \n");
                 string name = Console.ReadLine();
-
-                bool gotInput = false;
+ 
 
                 double accountBalance = GetAmount();
 
-                int userID = rand.Next(10, 100);
+                bool takenUserID = false;
 
-                User user = new User(name, accountBalance, userID);
-                Console.WriteLine($"{user.Name} {user.AccountBalance} {user.UserID}");
 
-                userDict[user.UserID] = user;
-                Console.WriteLine("Do you want to continue adding new users?");
-                string temp = Console.ReadLine().ToLower();
+                while (!takenUserID)
+                {
+                    int userID = rand.Next(10, 100);
 
-                addUsers = (temp == "y") ? true : false;
+                    if (CheckUser(userID) == null)
+                    {
+                        User user = new User(name, accountBalance, userID);
+                        Console.WriteLine($"{user.Name} {user.AccountBalance} {user.UserID}");
+
+                        userDict[user.UserID] = user;
+                        takenUserID = true;
+
+                        Console.WriteLine("Do you want to continue adding new users?");
+                        string temp = Console.ReadLine().ToLower();
+
+                        addUsers = (temp == "y") ? true : false;
+                    }
+                }
             }
         }
 
@@ -187,7 +197,6 @@
                 User? user2 = UserInputHandler();
 
                 double transferAmount = GetAmount();
-
 
                 if ((user1.AccountBalance - transferAmount) >= 0)
                 {
