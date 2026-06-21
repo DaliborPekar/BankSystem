@@ -1,4 +1,6 @@
-﻿namespace BankSystem
+﻿using System.ComponentModel.Design;
+
+namespace BankSystem
 {
     internal class BankManager
     {
@@ -12,7 +14,7 @@
             FileLoading();
 
             Console.WriteLine("Do you want to login or register: (l for login or r for register)");
-            string input = Convert.ToString(Console.ReadLine()).ToLower();
+            string input = Console.ReadLine().ToLower();
             Console.Clear();
 
             if (input == "l")
@@ -32,7 +34,17 @@
                 Registration();
             }
 
-            MainMenu();
+            if (input == "a")
+            {
+                Admin admin = new Admin();
+                user = new User(admin.Name, admin.AccountBalance, admin.UserID, admin.Pin);
+                AdminMainMenu();
+            }
+            else
+            {
+                MainMenu();
+            }
+
             SaveFile();
         }
 
@@ -92,21 +104,33 @@
 
                 Console.WriteLine("Enter the PIN: ");
 
-                int pin = Convert.ToInt32(Console.ReadLine());
+                string input = Console.ReadLine();
+                bool gotInput = false;
 
-                while (!takenUserID)
+                while(!gotInput)
                 {
-                    int userID = rand.Next(10, 100);
-
-                    if (CheckUser(userID) == null)
+                    if (int.TryParse(input, out int pin))
                     {
-                        user = new User(name, accountBalance, userID, pin);
+                        while (!takenUserID)
+                        {
+                            int userID = rand.Next(10, 100);
 
-                        Console.WriteLine($"{user.Name} {user.AccountBalance} {user.UserID} {user.Pin}");
+                            if (CheckUser(userID) == null)
+                            {
+                                user = new User(name, accountBalance, userID, pin);
 
-                        userDict[user.UserID] = user;
-                        takenUserID = true;
-                        registered = true;
+                                Console.WriteLine($"{user.Name} {user.AccountBalance} {user.UserID} {user.Pin}");
+
+                                userDict[user.UserID] = user;
+                                takenUserID = true;
+                                registered = true;
+                                gotInput = true;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("Please enter a number");
                     }
                 }
             }
@@ -121,37 +145,103 @@
             while (mainMenu)
             {
                 Console.WriteLine("Select mode: ");
-                Console.WriteLine("1 - AccountCreation\n2 - Deposit\n3 - Withdraw\n4 - Balance\n5 - AccountList\n6 - Transfer\n7 - Exit");
-                menuSelect = Convert.ToInt32(Console.ReadLine());
-                Console.Clear();
-                switch (menuSelect)
+                Console.WriteLine("1 - Deposit\n2 - Withdraw\n3 - Balance\n4 - Transfer\n5 - Exit");
+
+                bool gotInput = false;
+
+                while (!gotInput)
                 {
-                    case 1:
-                        AccountCreation();
-                        break;
+                    string input = Console.ReadLine();
+                    if (int.TryParse(input, out menuSelect))
+                    {
+                        Console.Clear();
+                        switch (menuSelect)
+                        {
+                            case 1:
+                                Deposit();
+                                break;
 
-                    case 2:
-                        Deposit();
-                        break;
+                            case 2:
+                                Withdraw();
+                                break;
+                            case 3:
+                                Balance();
+                                break;
+                            case 4:
+                                Transfer();
+                                break;
+                            case 5:
+                                mainMenu = false;
+                                break;
+                            default:
+                                mainMenu = false;
+                                break;
+                        }
 
-                    case 3:
-                        Withdraw();
-                        break;
-                    case 4:
-                        Balance();
-                        break;
-                    case 5:
-                        AccountList();
-                        break;
-                    case 6:
-                        Transfer();
-                        break;
-                    case 7:
-                        mainMenu = false;
-                        break;
-                    default:
-                        mainMenu = false;
-                        break;
+                        gotInput = true;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Please enter a number\n");
+                    }
+                }
+            }
+        }
+
+        private void AdminMainMenu()
+        {
+            bool mainMenu = true;
+
+            int menuSelect = 0;
+
+            while (mainMenu)
+            {
+                Console.WriteLine("Admin Menu:\n");
+                Console.WriteLine("Select mode: ");
+                Console.WriteLine("1 - AccountCreation\n2 - Deposit\n3 - Withdraw\n4 - Balance\n5 - AccountList\n6 - Transfer\n7 - Exit");
+                bool gotInput = false;
+                while(!gotInput)
+                {
+                    string input = Console.ReadLine();
+                    if (int.TryParse(input, out menuSelect))
+                    {
+                        Console.Clear();
+                        switch (menuSelect)
+                        {
+                            case 1:
+                                AccountCreation();
+                                break;
+
+                            case 2:
+                                Deposit();
+                                break;
+
+                            case 3:
+                                Withdraw();
+                                break;
+                            case 4:
+                                Balance();
+                                break;
+                            case 5:
+                                AccountList();
+                                break;
+                            case 6:
+                                Transfer();
+                                break;
+                            case 7:
+                                mainMenu = false;
+                                break;
+                            default:
+                                mainMenu = false;
+                                break;
+                        }
+
+                        gotInput = true;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Please enter a number!\n");
+                    }
                 }
             }
         }
@@ -240,7 +330,6 @@
                 string temp = Console.ReadLine().ToLower();
                 withdraw = (temp == "y") ? true : false;
                 Console.Clear();
-
             }
         }
 
@@ -269,6 +358,9 @@
                 User user = item.Value;
                 Console.WriteLine($"{user.Name} {user.AccountBalance} {user.UserID} {user.Pin}");
             }
+
+            Console.ReadKey();
+            Console.Clear();
         }
 
         private void Transfer()
