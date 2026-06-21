@@ -16,17 +16,20 @@
         private void FileLoading()
         {
 
-            if (File.Exists("users.csp"))
+            User user = new User("Admin", 999999, 67, 2104);
+            userDict[user.UserID] = user;
+
+            if (File.Exists("testing.csp"))
             {
                 Console.WriteLine("Loading data initialized!");
-                string[] text = File.ReadAllLines("users.csp");
+                string[] text = File.ReadAllLines("testing.csp");
 
                 foreach (string row in text)
                 {
                     string[] tokens = row.Split(",");
-                    Console.WriteLine($"{tokens[0]}, {tokens[1]}, {tokens[2]}");
+                    Console.WriteLine($"{tokens[0]}, {tokens[1]}, {tokens[2]}, {tokens[3]}");
 
-                    User user = new User(tokens[0], Convert.ToDouble(tokens[1]), Convert.ToInt32(tokens[2]));
+                    user = new User(tokens[0], Convert.ToDouble(tokens[1]), Convert.ToInt32(tokens[2]), Convert.ToInt32(tokens[3]));
 
                     userDict[user.UserID] = user;
                 }
@@ -81,18 +84,21 @@
 
         private void AccountCreation()
         {
+
             bool addUsers = true;
 
             while (addUsers)
             {
                 Console.Write("Enter the name: \n");
                 string name = Console.ReadLine();
- 
 
                 double accountBalance = GetAmount();
 
                 bool takenUserID = false;
 
+                Console.WriteLine("Enter the PIN: ");
+
+                int pin = Convert.ToInt32(Console.ReadLine());
 
                 while (!takenUserID)
                 {
@@ -100,8 +106,8 @@
 
                     if (CheckUser(userID) == null)
                     {
-                        User user = new User(name, accountBalance, userID);
-                        Console.WriteLine($"{user.Name} {user.AccountBalance} {user.UserID}");
+                        User user = new User(name, accountBalance, userID, pin);
+                        Console.WriteLine($"{user.Name} {user.AccountBalance} {user.UserID} {user.Pin}");
 
                         userDict[user.UserID] = user;
                         takenUserID = true;
@@ -122,14 +128,22 @@
             while (addBalance)
             {
                 User? user = UserInputHandler();
-                double addAmount = GetAmount();
 
-                user.AddBalance(addAmount);
-                Console.WriteLine($"New account balance is {user.AccountBalance}");
+                if (UserAuthorisation(user))
+                {
+                    double addAmount = GetAmount();
 
-                Console.WriteLine("Do you want to continue adding to the balance?");
-                string temp = Console.ReadLine().ToLower();
-                addBalance = (temp == "y") ? true : false;
+                    user.AddBalance(addAmount);
+                    Console.WriteLine($"New account balance is {user.AccountBalance}");
+
+                    Console.WriteLine("Do you want to continue adding to the balance?");
+                    string temp = Console.ReadLine().ToLower();
+                    addBalance = (temp == "y") ? true : false;
+                }
+                else
+                {
+                    addBalance = false;
+                }
             }
         }
 
@@ -141,22 +155,29 @@
             {
                 User? user = UserInputHandler();
 
-                double withdrawAmount = GetAmount();
-
-                if ((user.AccountBalance - withdrawAmount) < 0)
+                if(UserAuthorisation(user))
                 {
-                    Console.WriteLine("Not enough money!");
+                    double withdrawAmount = GetAmount();
+
+                    if ((user.AccountBalance - withdrawAmount) < 0)
+                    {
+                        Console.WriteLine("Not enough money!");
+                    }
+                    else
+                    {
+                        user.Withdraw(withdrawAmount);
+                        Console.WriteLine($"New account balance is {user.AccountBalance}");
+                    }
+
+                    Console.WriteLine("Do you want to continue withdrawing?");
+
+                    string temp = Console.ReadLine().ToLower();
+                    withdraw = (temp == "y") ? true : false;
                 }
                 else
                 {
-                    user.Withdraw(withdrawAmount);
-                    Console.WriteLine($"New account balance is {user.AccountBalance}");
+                    withdraw = false;
                 }
-
-                Console.WriteLine("Do you want to continue withdrawing?");
-
-                string temp = Console.ReadLine().ToLower();
-                withdraw = (temp == "y") ? true : false;
             }
         }
 
@@ -168,12 +189,19 @@
             {
                 User? user = UserInputHandler();
 
-                Console.WriteLine($"Account balance: {user.AccountBalance}");
+                if (UserAuthorisation(user))
+                {
+                    Console.WriteLine($"Account balance: {user.AccountBalance}");
 
-                Console.WriteLine("Do you want to check another user?");
+                    Console.WriteLine("Do you want to check another user?");
 
-                string temp = Console.ReadLine().ToLower();
-                balance = (temp == "y") ? true : false;
+                    string temp = Console.ReadLine().ToLower();
+                    balance = (temp == "y") ? true : false;
+                }
+                else
+                {
+                    balance = false;
+                }
             }
         }
 
@@ -182,7 +210,7 @@
             foreach (var item in userDict)
             {
                 User user = item.Value;
-                Console.WriteLine($"{user.Name} {user.AccountBalance} {user.UserID}");
+                Console.WriteLine($"{user.Name} {user.AccountBalance} {user.UserID} {user.Pin}");
             }
         }
 
@@ -194,30 +222,37 @@
                 bool gotInput = false;
                 User? user1 = UserInputHandler();
 
-                User? user2 = UserInputHandler();
-
-                double transferAmount = GetAmount();
-
-                if ((user1.AccountBalance - transferAmount) >= 0)
+                if(UserAuthorisation(user1))
                 {
-                    user1.Withdraw(transferAmount);
+                    User? user2 = UserInputHandler();
 
-                    user2.AddBalance(transferAmount);
+                    double transferAmount = GetAmount();
 
-                    Console.WriteLine(user1.AccountBalance);
+                    if ((user1.AccountBalance - transferAmount) >= 0)
+                    {
+                        user1.Withdraw(transferAmount);
 
-                    Console.WriteLine(user2.AccountBalance);
+                        user2.AddBalance(transferAmount);
 
-                    Console.WriteLine("Do you want to make a new transfer?");
-                    string temp = Console.ReadLine();
-                    transfer = (temp == "y") ? true : false;
+                        Console.WriteLine(user1.AccountBalance);
+
+                        Console.WriteLine(user2.AccountBalance);
+
+                        Console.WriteLine("Do you want to make a new transfer?");
+                        string temp = Console.ReadLine();
+                        transfer = (temp == "y") ? true : false;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Not enough money!");
+                        Console.WriteLine("Do you want to try again transfer?");
+                        string temp = Console.ReadLine();
+                        transfer = (temp == "y") ? true : false;
+                    }
                 }
                 else
                 {
-                    Console.WriteLine("Not enough money!");
-                    Console.WriteLine("Do you want to try again transfer?");
-                    string temp = Console.ReadLine();
-                    transfer = (temp == "y") ? true : false;
+                    transfer = false;
                 }
             }
         }
@@ -240,10 +275,10 @@
             foreach (var item in userDict)
             {
                 User user = item.Value;
-                userData.Add($"{user.Name},{user.AccountBalance},{user.UserID}");
+                userData.Add($"{user.Name},{user.AccountBalance},{user.UserID},{user.Pin}");
             }
 
-            File.WriteAllLines("users.csp", userData);
+            File.WriteAllLines("testing.csp", userData);
 
             Console.ReadKey();
         }
@@ -278,6 +313,35 @@
             return user;
         }
 
+        private bool UserAuthorisation(User user)
+        {
+            int input;
+            int atempts = 3;
+            do
+            {
+                Console.WriteLine("Enter PIN: ");
+                input = Convert.ToInt32(Console.ReadLine());
+                if (user.Pin != input)
+                {
+                    Console.WriteLine("Wrong PIN!");
+                    atempts--;
+                    Console.WriteLine($"{atempts} attempts remaining!\n");
+                }
+            }
+
+            while (user.Pin !=input && atempts > 0);
+
+            if (atempts == 0)
+            {
+                Console.WriteLine("Authorization failed. Going back to main menu!!");
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+
         private double GetAmount()
         {
             string input;
@@ -287,13 +351,12 @@
                 Console.WriteLine("Enter amount: ");
                 input = Console.ReadLine();
 
-                if ((double.TryParse(input, out amount)) == false)
+                if (double.TryParse(input, out amount) == false)
                 {
                     Console.WriteLine("Please enter a number!");
                 }
             }
-
-            while ((double.TryParse(input, out amount)) == false);
+            while (double.TryParse(input, out amount) == false);
 
             return amount;
         }
