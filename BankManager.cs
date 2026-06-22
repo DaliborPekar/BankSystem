@@ -103,11 +103,12 @@ namespace BankSystem
 
                 Console.WriteLine("Enter the PIN: ");
 
-                string input = Console.ReadLine();
+                
                 bool gotInput = false;
 
                 while(!gotInput)
                 {
+                    string input = Console.ReadLine();
                     if (int.TryParse(input, out int pin))
                     {
                         while (!takenUserID)
@@ -259,7 +260,7 @@ namespace BankSystem
             {
                 string input = Console.ReadLine();
 
-                if (int.TryParse(input, out pin));
+                if (int.TryParse(input, out pin))
                 gotInput = true;
             }
 
