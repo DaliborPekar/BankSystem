@@ -4,7 +4,6 @@ namespace BankSystem
 {
     internal class BankManager
     {
-
         Dictionary<int, User> userDict = new Dictionary<int, User>();
         Random rand = new Random();
 
@@ -144,7 +143,8 @@ namespace BankSystem
 
             while (mainMenu)
             {
-                Console.WriteLine("Select mode: ");
+                Console.WriteLine($"Main Menu \t\t{user.Name}\n");
+                Console.WriteLine($"Select mode: ");
                 Console.WriteLine("1 - Deposit\n2 - Withdraw\n3 - Balance\n4 - Transfer\n5 - Exit");
 
                 bool gotInput = false;
@@ -198,7 +198,7 @@ namespace BankSystem
             {
                 Console.WriteLine("Admin Menu:\n");
                 Console.WriteLine("Select mode: ");
-                Console.WriteLine("1 - AccountCreation\n2 - Deposit\n3 - Withdraw\n4 - Balance\n5 - AccountList\n6 - Transfer\n7 - Exit");
+                Console.WriteLine("1 - Account Creation\n2 - Account List\n3 - Remove User\n4 - Change Password\n5 - Exit");
                 bool gotInput = false;
                 while(!gotInput)
                 {
@@ -211,24 +211,16 @@ namespace BankSystem
                             case 1:
                                 AccountCreation();
                                 break;
-
                             case 2:
-                                Deposit();
-                                break;
-
-                            case 3:
-                                Withdraw();
-                                break;
-                            case 4:
-                                Balance();
-                                break;
-                            case 5:
                                 AccountList();
                                 break;
-                            case 6:
-                                Transfer();
+                            case 3:
+                                RemoveUser();
                                 break;
-                            case 7:
+                            case 4:
+                                ChangePassword();
+                                break;
+                            case 5:
                                 mainMenu = false;
                                 break;
                             default:
@@ -244,6 +236,35 @@ namespace BankSystem
                     }
                 }
             }
+        }
+
+        private void RemoveUser()
+        {
+            User? user0 = UserInputHandler();
+            Console.WriteLine("Are you sure that you want to remove this user? (Press any key to continue)");
+            Console.ReadKey();
+            userDict.Remove(user0.UserID);
+        }
+
+        private void ChangePassword()
+        {
+            User? user0 = UserInputHandler();
+            Console.WriteLine("Are you sure that you want to change pin? (Press any key to continue)");
+            Console.ReadKey();
+            Console.WriteLine("Enter the new pin:");
+
+            bool gotInput = false;
+            int pin = 0;
+            while (!gotInput)
+            {
+                string input = Console.ReadLine();
+
+                if (int.TryParse(input, out pin));
+                gotInput = true;
+            }
+
+            user0 = new User(user0.Name,user0.AccountBalance,user0.UserID,pin);
+            userDict[user0.UserID] = user0;
         }
 
         private void AccountCreation()
@@ -293,7 +314,7 @@ namespace BankSystem
 
             while (addBalance)
             {
-                Console.WriteLine("Deposit:\n");
+                Console.WriteLine($"Deposit \t\t{user.Name}\n");
                 double addAmount = GetAmount();
 
                 user.AddBalance(addAmount);
@@ -312,7 +333,7 @@ namespace BankSystem
 
             while (withdraw)
             {
-                Console.WriteLine("Withdraw:\n");
+                Console.WriteLine($"Withdraw \t\t{user.Name}\n");
                 double withdrawAmount = GetAmount();
 
                 if ((user.AccountBalance - withdrawAmount) < 0)
@@ -339,7 +360,7 @@ namespace BankSystem
 
             while (balance)
             {
-                Console.WriteLine("Balance:\n");
+                Console.WriteLine($"Balance \t\t{user.Name}\n");
                 Console.WriteLine($"Account balance: {user.AccountBalance}");
 
                 Console.WriteLine("Do you want to check another user?");
@@ -368,7 +389,7 @@ namespace BankSystem
             bool transfer = true;
             while (transfer)
             {
-                Console.WriteLine("Transfer:\n");
+                Console.WriteLine($"Transfer \t\t{user.Name}\n");
                 User? user2 = UserInputHandler();
 
                 double transferAmount = GetAmount();
