@@ -36,8 +36,31 @@ namespace BankSystem
             if (input == "a")
             {
                 Admin admin = new Admin();
-                user = new User(admin.Name, admin.AccountBalance, admin.UserID, admin.Pin);
-                AdminMainMenu();
+                int inputPin;
+                int atempts = 3;
+                do
+                {
+                    Console.WriteLine("Enter PIN: ");
+                    inputPin = Convert.ToInt32(Console.ReadLine());
+                    if (admin.Pin != inputPin)
+                    {
+                        Console.WriteLine("Wrong PIN!");
+                        atempts--;
+                        Console.WriteLine($"{atempts} attempts remaining!\n");
+                    }
+                }
+
+                while (admin.Pin != inputPin && atempts > 0);
+
+                if (atempts == 0)
+                {
+                    Console.WriteLine("Authorization failed. Exiting...");
+
+                }
+                else
+                {
+                    AdminMainMenu();
+                }
             }
             else
             {
@@ -103,7 +126,6 @@ namespace BankSystem
 
                 Console.WriteLine("Enter the PIN: ");
 
-                
                 bool gotInput = false;
 
                 while(!gotInput)
@@ -484,12 +506,19 @@ namespace BankSystem
             do
             {
                 Console.WriteLine("Enter PIN: ");
-                input = Convert.ToInt32(Console.ReadLine());
-                if (user.Pin != input)
+                string input1 = Console.ReadLine();
+                if(int.TryParse(input1, out input))
                 {
-                    Console.WriteLine("Wrong PIN!");
-                    atempts--;
-                    Console.WriteLine($"{atempts} attempts remaining!\n");
+                    if (user.Pin != input)
+                    {
+                        Console.WriteLine("Wrong PIN!");
+                        atempts--;
+                        Console.WriteLine($"{atempts} attempts remaining!\n");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Enter the number");
                 }
             }
 
@@ -497,7 +526,7 @@ namespace BankSystem
 
             if (atempts == 0)
             {
-                Console.WriteLine("Authorization failed. Going back to main menu!!");
+                Console.WriteLine("Authorization failed!!");
                 return false;
             }
             else
