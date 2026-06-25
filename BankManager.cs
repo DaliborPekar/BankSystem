@@ -1,11 +1,10 @@
-﻿using System.ComponentModel.Design;
-
-namespace BankSystem
+﻿namespace BankSystem
 {
     internal class BankManager
     {
         Dictionary<int, User> userDict = new Dictionary<int, User>();
         Random rand = new Random();
+        User? user;
 
         public void Run()
         {
@@ -22,49 +21,56 @@ namespace BankSystem
                 {
                     Console.WriteLine("There is no users available, please register.");
                     Registration();
+                    MainMenu();
                 }
                 else if (!noUsers)
                 {
                     Login();
+                    MainMenu();
                 }
             }
             else if (input == "r")
             {
                 Registration();
+                MainMenu();
             }
 
             if (input == "a")
             {
                 Admin admin = new Admin();
-                int inputPin;
-                int atempts = 3;
+                int inputPin = 0;
+                int attempts = 3;
                 do
                 {
-                    Console.WriteLine("Enter PIN: ");
-                    inputPin = Convert.ToInt32(Console.ReadLine());
+                    bool gotInput = false;
+
+                    while (!gotInput)
+                    {
+                        Console.WriteLine("Enter PIN: ");
+                        input = Console.ReadLine();
+                        if (int.TryParse(input, out inputPin))
+                        {
+                            gotInput = true;
+                        }
+                    }
+
                     if (admin.Pin != inputPin)
                     {
                         Console.WriteLine("Wrong PIN!");
-                        atempts--;
-                        Console.WriteLine($"{atempts} attempts remaining!\n");
+                        attempts--;
+                        Console.WriteLine($"{attempts} attempts remaining!\n");
                     }
                 }
+                while (admin.Pin != inputPin && attempts > 0);
 
-                while (admin.Pin != inputPin && atempts > 0);
-
-                if (atempts == 0)
+                if (attempts == 0)
                 {
                     Console.WriteLine("Authorization failed. Exiting...");
-
                 }
                 else
                 {
                     AdminMainMenu();
                 }
-            }
-            else
-            {
-                MainMenu();
             }
 
             SaveFile();
@@ -78,13 +84,29 @@ namespace BankSystem
             {
                 string[] text = File.ReadAllLines("testing.csp");
 
-                foreach (string row in text)
+                if (text.Length != 0)
                 {
-                    string[] tokens = row.Split(",");
+                    try
+                    {
+                        foreach (string row in text)
+                        {
+                            string[] tokens = row.Split(",");
 
-                    user = new User(tokens[0], Convert.ToDouble(tokens[1]), Convert.ToInt32(tokens[2]), Convert.ToInt32(tokens[3]));
+                            user = new User(tokens[0], Convert.ToDouble(tokens[1]), Convert.ToInt32(tokens[2]), Convert.ToInt32(tokens[3]));
 
-                    userDict[user.UserID] = user;
+                            userDict[user.UserID] = user;
+                        }
+                    }
+                    catch
+                    {
+                        Console.WriteLine("File is corrupted\n");
+                        userDict.Clear();
+                        noUsers = true;
+                    }
+                }
+                else
+                {
+                    noUsers = true;
                 }
             }
             else
@@ -93,20 +115,18 @@ namespace BankSystem
             }
         }
 
-        User? user;
-
         private void Login()
         {
-            bool logedIn = false;
+            bool loggedIn = false;
             Console.WriteLine("Login:\n");
-            while (!logedIn)
+            while (!loggedIn)
             {
                 user = UserInputHandler();
 
-                if (UserAuthorisation(user))
+                if (UserAuthorization(user))
                 {
-                    Console.WriteLine("\nLogin succesful\n");
-                    logedIn = true;
+                    Console.WriteLine("\nLogin successful\n");
+                    loggedIn = true;
                     Console.Clear();
                 }
             }
@@ -128,7 +148,7 @@ namespace BankSystem
 
                 bool gotInput = false;
 
-                while(!gotInput)
+                while (!gotInput)
                 {
                     string input = Console.ReadLine();
                     if (int.TryParse(input, out int pin))
@@ -147,6 +167,9 @@ namespace BankSystem
                                 takenUserID = true;
                                 registered = true;
                                 gotInput = true;
+
+                                Console.ReadKey();
+                                Console.Clear();
                             }
                         }
                     }
@@ -183,7 +206,6 @@ namespace BankSystem
                             case 1:
                                 Deposit();
                                 break;
-
                             case 2:
                                 Withdraw();
                                 break;
@@ -223,7 +245,7 @@ namespace BankSystem
                 Console.WriteLine("Select mode: ");
                 Console.WriteLine("1 - Account Creation\n2 - Account List\n3 - Remove User\n4 - Change Password\n5 - Exit");
                 bool gotInput = false;
-                while(!gotInput)
+                while (!gotInput)
                 {
                     string input = Console.ReadLine();
                     if (int.TryParse(input, out menuSelect))
@@ -283,10 +305,12 @@ namespace BankSystem
                 string input = Console.ReadLine();
 
                 if (int.TryParse(input, out pin))
-                gotInput = true;
+                {
+                    gotInput = true;
+                }
             }
 
-            user0 = new User(user0.Name,user0.AccountBalance,user0.UserID,pin);
+            user0 = new User(user0.Name, user0.AccountBalance, user0.UserID, pin);
             userDict[user0.UserID] = user0;
         }
 
@@ -303,30 +327,43 @@ namespace BankSystem
                 double accountBalance = GetAmount();
 
                 bool takenUserID = false;
+                bool gotInput = false;
+                int pin = 0;
 
-                Console.WriteLine("Enter the PIN: ");
-
-                int pin = Convert.ToInt32(Console.ReadLine());
-
-                while (!takenUserID)
+                while (!gotInput)
                 {
-                    int userID = rand.Next(10, 100);
+                    Console.WriteLine("Enter the PIN: ");
+                    string input = Console.ReadLine();
 
-                    if (CheckUser(userID) == null)
+                    if (int.TryParse(input, out pin))
                     {
-                        User user = new User(name, accountBalance, userID, pin);
-                        Console.WriteLine($"{user.Name} {user.AccountBalance} {user.UserID} {user.Pin}");
+                        while (!takenUserID)
+                        {
+                            int userID = rand.Next(10, 100);
 
-                        userDict[user.UserID] = user;
-                        takenUserID = true;
+                            if (CheckUser(userID) == null)
+                            {
+                                User user = new User(name, accountBalance, userID, pin);
+                                Console.WriteLine($"{user.Name} {user.AccountBalance} {user.UserID} {user.Pin}");
 
-                        Console.WriteLine("Do you want to continue adding new users?");
-                        string temp = Console.ReadLine().ToLower();
+                                userDict[user.UserID] = user;
+                                takenUserID = true;
 
-                        addUsers = (temp == "y") ? true : false;
+                                gotInput = true;
+
+                                Console.WriteLine("Do you want to continue adding new users?");
+                                string temp = Console.ReadLine().ToLower();
+
+                                addUsers = (temp == "y") ? true : false;
+                            }
+
+                            Console.Clear();
+                        }
                     }
-
-                    Console.Clear();
+                    else
+                    {
+                        Console.WriteLine("Please enter a number!!");
+                    }
                 }
             }
         }
@@ -499,21 +536,21 @@ namespace BankSystem
             return user;
         }
 
-        private bool UserAuthorisation(User user)
+        private bool UserAuthorization(User user)
         {
             int input;
-            int atempts = 3;
+            int attempts = 3;
             do
             {
                 Console.WriteLine("Enter PIN: ");
                 string input1 = Console.ReadLine();
-                if(int.TryParse(input1, out input))
+                if (int.TryParse(input1, out input))
                 {
                     if (user.Pin != input)
                     {
                         Console.WriteLine("Wrong PIN!");
-                        atempts--;
-                        Console.WriteLine($"{atempts} attempts remaining!\n");
+                        attempts--;
+                        Console.WriteLine($"{attempts} attempts remaining!\n");
                     }
                 }
                 else
@@ -521,10 +558,9 @@ namespace BankSystem
                     Console.WriteLine("Enter the number");
                 }
             }
+            while (user.Pin != input && attempts > 0);
 
-            while (user.Pin != input && atempts > 0);
-
-            if (atempts == 0)
+            if (attempts == 0)
             {
                 Console.WriteLine("Authorization failed!!");
                 return false;
